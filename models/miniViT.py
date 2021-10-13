@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from .ffc import FFC
+# from .ffc import FFC
 from .layers import PatchTransformerEncoder, PixelWiseDotProduct
 
 
@@ -20,7 +20,7 @@ class mViT(nn.Module):
                                        nn.Linear(256, 256),
                                        nn.LeakyReLU(),
                                        nn.Linear(256, dim_out))
-        self.FFC = FFC(in_channels=128, out_channels=128, kernel_size=3, padding=1, ratio_gin=0.5, ratio_gout=0.5)
+        # self.FFC = FFC(in_channels=128, out_channels=128, kernel_size=3, padding=1, ratio_gin=0.5, ratio_gout=0.5)
 
     def forward(self, x):
         # n, c, h, w = x.size()
@@ -28,9 +28,9 @@ class mViT(nn.Module):
 
         # 2, 128, 176, 352
         # add fourier layer
-        x_l, x_g = self.FFC((x[:, :64, :, :], x[:, 64:, :, :]))
-        fourier = torch.cat((x_l, x_g), dim=1)
-        x = x + fourier
+        # x_l, x_g = self.FFC((x[:, :64, :, :], x[:, 64:, :, :]))
+        # fourier = torch.cat((x_l, x_g), dim=1)
+        # x = x + fourier
         x = self.conv3x3(x)
 
 

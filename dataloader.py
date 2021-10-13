@@ -38,6 +38,7 @@ class DepthDataLoader(object):
                                    shuffle=(self.train_sampler is None),
                                    num_workers=args.num_threads,
                                    pin_memory=True,
+                                   drop_last=True,
                                    sampler=self.train_sampler)
 
         elif mode == 'online_eval':
@@ -51,6 +52,7 @@ class DepthDataLoader(object):
                                    shuffle=False,
                                    num_workers=1,
                                    pin_memory=False,
+                                   drop_last=True,
                                    sampler=self.eval_sampler)
 
         elif mode == 'test':

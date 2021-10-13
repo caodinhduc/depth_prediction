@@ -4,6 +4,7 @@ import torch.nn.functional as F
 
 from .miniViT import mViT
 from .ffc import FFC
+from .aspp import * 
 
 
 class UpSampleBN(nn.Module):
@@ -39,6 +40,8 @@ class DecoderBN(nn.Module):
         self.conv3 = nn.Conv2d(features // 16, num_classes, kernel_size=3, stride=1, padding=1)
         # self.act_out = nn.Softmax(dim=1) if output_activation == 'softmax' else nn.Identity()
 
+        self.aspp = build_aspp(backbone='adabins', output_stride=16)
+
     def forward(self, features):
         x_block0, x_block1, x_block2, x_block3, x_block4 = features[4], features[5], features[6], features[8], features[
             11]
@@ -52,6 +55,7 @@ class DecoderBN(nn.Module):
         x_d4 = self.up4(x_d3, x_block0)
         #         x_d5 = self.up5(x_d4, features[0])
         out = self.conv3(x_d4)
+        out = self.aspp(out)
         # out = self.act_out(out)
         # if with_features:
         #     return out, features[-1]
@@ -97,6 +101,7 @@ class UnetAdaptiveBins(nn.Module):
         # print('input shape: ', x.shape)
         # encode = self.encoder(x)
         # print('encode shape: ', encode[0].shape)
+        # 2, 3, 353, 704
         unet_out = self.decoder(self.encoder(x), **kwargs) # ([batch_size, 128, 240, 320])
         # x_l, x_g = self.FFC((unet_out[:, :64, :, :], unet_out[:, 64:, :, :]))
 
