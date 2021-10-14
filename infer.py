@@ -162,6 +162,7 @@ if __name__ == '__main__':
     start = time()
     inferHelper = InferenceHelper(dataset='kitti', checkpoint='./checkpoints/11_FFC_best.pt')      
     centers, pred = inferHelper.predict_pil(img)
+    print(pred.shape)
     print(f"took :{time() - start}s")
     plt.imshow(pred.squeeze(), cmap='magma_r')
     plt.show()
