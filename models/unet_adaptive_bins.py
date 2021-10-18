@@ -32,6 +32,7 @@ class DecoderBN(nn.Module):
 
         self.up1 = UpSampleBN(skip_input=features // 1 + 112 + 64, output_features=features // 2)
         self.up2 = UpSampleBN(skip_input=features // 2 + 40 + 24, output_features=features // 4)
+
         self.up3 = UpSampleBN(skip_input=features // 4 + 24 + 16, output_features=features // 8)
         self.up4 = UpSampleBN(skip_input=features // 8 + 16 + 8, output_features=features // 16)
 
@@ -39,17 +40,44 @@ class DecoderBN(nn.Module):
         self.conv3 = nn.Conv2d(features // 16, num_classes, kernel_size=3, stride=1, padding=1)
         # self.act_out = nn.Softmax(dim=1) if output_activation == 'softmax' else nn.Identity()
 
+
+        self.FFC_1024 = FFC(in_channels=1024, out_channels=1024, kernel_size=3, padding=1, ratio_gin=0.5, ratio_gout=0.5)
+        self.FFC_512 = FFC(in_channels=512, out_channels=512, kernel_size=3, padding=1, ratio_gin=0.5, ratio_gout=0.5)
+        self.FFC_256 = FFC(in_channels=256, out_channels=256, kernel_size=3, padding=1, ratio_gin=0.5, ratio_gout=0.5)
+        self.FFC_128 = FFC(in_channels=128, out_channels=128, kernel_size=3, padding=1, ratio_gin=0.5, ratio_gout=0.5)
+
     def forward(self, features):
         x_block0, x_block1, x_block2, x_block3, x_block4 = features[4], features[5], features[6], features[8], features[
             11]
 
         x_d0 = self.conv2(x_block4)
-
         x_d1 = self.up1(x_d0, x_block3)
+
+        # add fourier layer
+        x_l1, x_g1 = self.FFC_1024((x_d1[:, :512, :, :], x_d1[:, 512:, :, :]))
+        fourier1 = torch.cat((x_l1, x_g1), dim=1)
+        x_d1 = x_d1 + fourier1
+
         x_d2 = self.up2(x_d1, x_block2)
+        # add fourier layer
+        x_l2, x_g2 = self.FFC_512((x_d2[:, :256, :, :], x_d2[:, 256:, :, :]))
+        fourier2 = torch.cat((x_l2, x_g2), dim=1)
+        x_d2 = x_d2 + fourier2
+
+
         x_d3 = self.up3(x_d2, x_block1)
+        
+        # add fourier layer
+        x_l3, x_g3 = self.FFC_256((x_d3[:, :128, :, :], x_d3[:, 128:, :, :]))
+        fourier3 = torch.cat((x_l3, x_g3), dim=1)
+        x_d3 = x_d3 + fourier3
 
         x_d4 = self.up4(x_d3, x_block0)
+        # add fourier layer
+        x_l4, x_g4 = self.FFC_128((x_d4[:, :64, :, :], x_d4[:, 64:, :, :]))
+        fourier4 = torch.cat((x_l4, x_g4), dim=1)
+        x_d4 = x_d4 + fourier4
+
         #         x_d5 = self.up5(x_d4, features[0])
         out = self.conv3(x_d4)
         # out = self.act_out(out)
@@ -91,7 +119,6 @@ class UnetAdaptiveBins(nn.Module):
         self.conv_out = nn.Sequential(nn.Conv2d(128, n_bins, kernel_size=1, stride=1, padding=0),
                                       nn.Softmax(dim=1))
 
-        # self.FFC = FFC(in_channels=128, out_channels=128, kernel_size=3, padding=1, ratio_gin=0.5, ratio_gout=0.5)
 
     def forward(self, x, **kwargs):
         # print('input shape: ', x.shape)
