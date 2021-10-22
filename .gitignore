@@ -1,0 +1,16 @@
+*.pyc
+__pycache__/
+.env
+.idea/
+predictions_nyu/
+predictions_kitti/
+wandb/
+checkpoints/
+pre_trained/
+prediction/
+train_test_inputs/
+back_up_checkpoints/
+.ipynb_checkpoints/
+test_ffc.ipynb
+test.ipynb
+

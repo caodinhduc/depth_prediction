@@ -339,7 +339,7 @@ if __name__ == '__main__':
 
     parser.add_argument("--data_path", default='../KITTI_Dense_Depth', type=str,
                         help="path to dataset")
-    parser.add_argument("--gt_path", default='../../Downloads/data_depth_annotated/train', type=str,
+    parser.add_argument("--gt_path", default='../data_depth_annotated/train', type=str,
                         help="path to dataset")
 
     # parser.add_argument('--filenames_file',
@@ -376,7 +376,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_path_eval',
                         default="../KITTI_Dense_Depth",
                         type=str, help='path to the data for online evaluation')
-    parser.add_argument('--gt_path_eval', default="../../Downloads/data_depth_annotated/train",
+    parser.add_argument('--gt_path_eval', default="../data_depth_annotated/train",
                         type=str, help='path to the groundtruth data for online evaluation')
     parser.add_argument('--filenames_file_eval',
                         default="./train_test_inputs/kitti_eigen_test_files_with_gt.txt",
