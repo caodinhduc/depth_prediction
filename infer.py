@@ -155,14 +155,18 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(description='inference')
-    parser.add_argument('--image_path', default='test_imgs/4.png', type=str, help='path of images')
+    parser.add_argument('--image_path', default='test_imgs/test.png', type=str, help='path of images')
+    parser.add_argument('--save_path', default='prediction/test.png', type=str, help='path of images')
     args = parser.parse_args()
 
     img = Image.open(args.image_path)
     start = time()
-    inferHelper = InferenceHelper(dataset='kitti', checkpoint='./checkpoints/11_FFC_best.pt')      
+    inferHelper = InferenceHelper(dataset='kitti', checkpoint='./checkpoints/ffc_before_conv_latest.pt')      
     centers, pred = inferHelper.predict_pil(img)
     print(pred.shape)
     print(f"took :{time() - start}s")
-    plt.imshow(pred.squeeze(), cmap='magma_r')
-    plt.show()
+   
+    # predict and save image
+    final = (pred.squeeze() * 128).astype('uint16')
+    Image.fromarray(final).save(args.save_path)
+   

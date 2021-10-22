@@ -91,17 +91,9 @@ class UnetAdaptiveBins(nn.Module):
         self.conv_out = nn.Sequential(nn.Conv2d(128, n_bins, kernel_size=1, stride=1, padding=0),
                                       nn.Softmax(dim=1))
 
-        # self.FFC = FFC(in_channels=128, out_channels=128, kernel_size=3, padding=1, ratio_gin=0.5, ratio_gout=0.5)
 
     def forward(self, x, **kwargs):
-        # print('input shape: ', x.shape)
-        # encode = self.encoder(x)
-        # print('encode shape: ', encode[0].shape)
         unet_out = self.decoder(self.encoder(x), **kwargs) # ([batch_size, 128, 240, 320])
-        # x_l, x_g = self.FFC((unet_out[:, :64, :, :], unet_out[:, 64:, :, :]))
-
-        # fourier = torch.cat((x_l, x_g), dim=1)
-        # unet_out = unet_out + fourier
 
         bin_widths_normed, range_attention_maps = self.adaptive_bins_layer(unet_out)
         out = self.conv_out(range_attention_maps)
