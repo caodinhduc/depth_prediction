@@ -155,7 +155,7 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(description='inference')
-    parser.add_argument('--image_path', default='test_imgs/test.png', type=str, help='path of images')
+    parser.add_argument('--image_path', default='test_imgs/0000000200.png', type=str, help='path of images')
     parser.add_argument('--save_path', default='prediction/test.png', type=str, help='path of images')
     args = parser.parse_args()
 

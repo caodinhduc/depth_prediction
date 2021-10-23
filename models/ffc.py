@@ -141,8 +141,8 @@ class FFC(nn.Module):
         #groups_g = 1 if groups == 1 else int(groups * ratio_gout)
         #groups_l = 1 if groups == 1 else groups - groups_g
 
-        print('in_cl: ', in_cl)
-        print('in_cl: ', in_cl)
+        # print('in_cl: ', in_cl)
+        # print('in_cl: ', in_cl)
 
 
         self.ratio_gin = ratio_gin
