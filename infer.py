@@ -155,8 +155,8 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(description='inference')
-    parser.add_argument('--image_path', default='test_imgs/0000000200.png', type=str, help='path of images')
-    parser.add_argument('--save_path', default='prediction/test.png', type=str, help='path of images')
+    parser.add_argument('--image_path', default='input.png', type=str, help='path of images')
+    parser.add_argument('--save_path', default='output.png', type=str, help='path of images')
     args = parser.parse_args()
 
     img = Image.open(args.image_path)
@@ -167,6 +167,22 @@ if __name__ == '__main__':
     print(f"took :{time() - start}s")
    
     # predict and save image
-    final = (pred.squeeze() * 128).astype('uint16')
+    final = (pred.squeeze() * 256).astype('uint16')
+    print(type(final))
+    print(pred.squeeze().astype('uint16'))
     Image.fromarray(final).save(args.save_path)
-   
+
+
+    # output_path = 'prediction'
+    # benchmark_folder = '../../Downloads/data_depth_selection/depth_selection/test_depth_prediction_anonymous/image/'
+    # inferHelper = InferenceHelper(dataset='kitti', checkpoint='./checkpoints/ffc_before_conv_latest.pt')
+
+    # for idx, path in enumerate(os.listdir(benchmark_folder)):
+    #     img_path = os.path.join(benchmark_folder, path)
+    #     img = Image.open(img_path)
+    #     centers, pred = inferHelper.predict_pil(img)
+
+    #     final = (pred.squeeze() * 256).astype('uint16')
+    #     Image.fromarray(final).save(os.path.join(output_path, path))
+    #     print('saved image {}'.format(idx))
+    

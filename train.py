@@ -342,10 +342,6 @@ if __name__ == '__main__':
     parser.add_argument("--gt_path", default='../data_depth_annotated/train', type=str,
                         help="path to dataset")
 
-    # parser.add_argument('--filenames_file',
-    #                     default="./train_test_inputs/nyudepthv2_train_files_with_gt.txt",
-    #                     type=str, help='path to the filenames text file')
-
     parser.add_argument('--filenames_file',
                         default="./train_test_inputs/kitti_eigen_train_files_with_gt.txt",
                         type=str, help='path to the filenames text file')
@@ -362,15 +358,6 @@ if __name__ == '__main__':
     parser.add_argument('--do_kb_crop', default = True, help='if set, crop input images as kitti benchmark images', action='store_true')
     parser.add_argument('--use_right', help='if set, will randomly use right images when train on KITTI',
                         action='store_true')
-
-    # parser.add_argument('--data_path_eval',
-    #                     default="../dataset/nyu/official_splits/test/",
-    #                     type=str, help='path to the data for online evaluation')
-    # parser.add_argument('--gt_path_eval', default="../dataset/nyu/official_splits/test/",
-    #                     type=str, help='path to the groundtruth data for online evaluation')
-    # parser.add_argument('--filenames_file_eval',
-    #                     default="./train_test_inputs/nyudepthv2_test_files_with_gt.txt",
-    #                     type=str, help='path to the filenames text file for online evaluation')
 
 
     parser.add_argument('--data_path_eval',
