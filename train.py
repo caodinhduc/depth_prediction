@@ -73,6 +73,7 @@ def main_worker(gpu, ngpus_per_node, args):
     model = models.UnetAdaptiveBins.build(n_bins=args.n_bins, min_val=args.min_depth, max_val=args.max_depth,
                                           norm=args.norm)
 
+
     ################################################################################################
 
     if args.gpu is not None:  # If a gpu is set by user: NO PARALLELISM!!
@@ -329,7 +330,7 @@ if __name__ == '__main__':
     parser.add_argument("--notes", default='', type=str, help="Wandb notes")
     parser.add_argument("--tags", default='sweep', type=str, help="Wandb tags")
 
-    parser.add_argument("--workers", default=11, type=int, help="Number of workers for data loading")
+    parser.add_argument("--workers", default=4, type=int, help="Number of workers for data loading")
     parser.add_argument("--dataset", default='kitti', type=str, help="Dataset to train on")
 
     # parser.add_argument("--data_path", default='../dataset/nyu/sync/', type=str,
