@@ -69,43 +69,44 @@ def remove_leading_slash(s):
     return s
 
 
-def remove_trash_item(filenames, path):
+def remove_trash_item(filenames):
     output = []
     for item in filenames:
-        if os.path.exists(os.path.join(path, remove_leading_slash(item.split()[1]))):
-            output.append(item)
+        output.append(item.replace('\n', ''))
     return output
 
 
 class DataLoadPreprocess(Dataset):
     def __init__(self, args, mode, transform=None, is_for_online_eval=False):
         self.args = args
+        self.train_X = 'train_test_inputs/images_train.txt'
+        # self.train_Y = 'train_test_inputs/depth_train.txt'
+        self.test_X = 'train_test_inputs/images_test.txt'
+        # self.test_Y = 'train_test_inputs/depth_test.txt'
         if mode == 'online_eval':
-            with open(args.filenames_file_eval, 'r') as f:
+            with open(self.test_X, 'r') as f:
                 self.filenames = f.readlines()
-                self.filenames = remove_trash_item(self.filenames, args.gt_path_eval)   # add function to remove non file
-        else:
-            with open(args.filenames_file, 'r') as f:
-                self.filenames = f.readlines()
-                self.filenames = remove_trash_item(self.filenames, args.gt_path)   # add function to remove non file
+                self.X = remove_trash_item(self.filenames)
+               # add function to remove non file
 
-        print('processing on {} images'.format(len(self.filenames)))
+        else:
+            with open(self.train_X, 'r') as f:
+                self.filenames = f.readlines()
+                self.X = remove_trash_item(self.filenames)
+               # add function to remove non file
+ 
+
+        print('processing on {} images'.format(len(self.X)))
         self.mode = mode
         self.transform = transform
         self.to_tensor = ToTensor
         self.is_for_online_eval = is_for_online_eval
 
     def __getitem__(self, idx):
-        sample_path = self.filenames[idx]
-        focal = float(sample_path.split()[2])
-
+        focal = 0.0
         if self.mode == 'train':
-            if self.args.dataset == 'kitti' and self.args.use_right is True and random.random() > 0.5:
-                image_path = os.path.join(self.args.data_path, remove_leading_slash(sample_path.split()[3]))
-                depth_path = os.path.join(self.args.gt_path, remove_leading_slash(sample_path.split()[4]))
-            else:
-                image_path = os.path.join(self.args.data_path, remove_leading_slash(sample_path.split()[0]))
-                depth_path = os.path.join(self.args.gt_path, remove_leading_slash(sample_path.split()[1]))
+            image_path =  self.X[idx]
+            depth_path = os.path.join('../data_depth_annotated/train', os.path.join(image_path.split('/')[3], 'proj_depth/groundtruth/image_02',image_path.split('/')[-1].replace('\n', '')))
 
             image = Image.open(image_path)
             depth_gt = Image.open(depth_path)
@@ -155,17 +156,11 @@ class DataLoadPreprocess(Dataset):
             sample = {'image': image, 'depth': depth_gt, 'focal': focal}
 
         else:
-            if self.mode == 'online_eval':
-                data_path = self.args.data_path_eval
-            else:
-                data_path = self.args.data_path
-
-            image_path = os.path.join(data_path, remove_leading_slash(sample_path.split()[0]))
+            image_path =  self.X[idx]
+            depth_path = os.path.join('../data_depth_annotated/train', os.path.join(image_path.split('/')[3], 'proj_depth/groundtruth/image_02',image_path.split('/')[-1].replace('\n', '')))
             image = np.asarray(Image.open(image_path), dtype=np.float32) / 255.0
-
             if self.mode == 'online_eval':
-                gt_path = self.args.gt_path_eval
-                depth_path = os.path.join(gt_path, remove_leading_slash(sample_path.split()[1]))
+                
                 has_valid_depth = False
                 try:
                     depth_gt = Image.open(depth_path)
@@ -193,7 +188,7 @@ class DataLoadPreprocess(Dataset):
 
             if self.mode == 'online_eval':
                 sample = {'image': image, 'depth': depth_gt, 'focal': focal, 'has_valid_depth': has_valid_depth,
-                          'image_path': sample_path.split()[0], 'depth_path': sample_path.split()[1]}
+                          'image_path': image_path, 'depth_path': depth_path}
             else:
                 sample = {'image': image, 'focal': focal}
 
@@ -253,7 +248,7 @@ class DataLoadPreprocess(Dataset):
         return image_aug
 
     def __len__(self):
-        return len(self.filenames)
+        return len(self.X)
 
 
 class ToTensor(object):

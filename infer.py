@@ -161,21 +161,21 @@ if __name__ == '__main__':
 
     img = Image.open(args.image_path)
     start = time()
-    inferHelper = InferenceHelper(dataset='kitti', checkpoint='./checkpoints/ffc_before_conv_latest.pt')      
+    inferHelper = InferenceHelper(dataset='kitti', checkpoint='checkpoints/augment_best.pt')      
     centers, pred = inferHelper.predict_pil(img)
     print(pred.shape)
     print(f"took :{time() - start}s")
    
     # predict and save image
     final = (pred.squeeze() * 256).astype('uint16')
-    print(type(final))
-    print(pred.squeeze().astype('uint16'))
+    # print(type(final))
+    # print(pred.squeeze().astype('uint16'))
     Image.fromarray(final).save(args.save_path)
 
 
     # output_path = 'prediction'
     # benchmark_folder = '../../Downloads/data_depth_selection/depth_selection/test_depth_prediction_anonymous/image/'
-    # inferHelper = InferenceHelper(dataset='kitti', checkpoint='./checkpoints/ffc_before_conv_latest.pt')
+    # inferHelper = InferenceHelper(dataset='kitti', checkpoint='./checkpoints/augment_latest.pt')
 
     # for idx, path in enumerate(os.listdir(benchmark_folder)):
     #     img_path = os.path.join(benchmark_folder, path)

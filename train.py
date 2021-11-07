@@ -5,6 +5,8 @@ import uuid
 from datetime import datetime as dt
 
 import numpy as np
+import math
+import random
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
@@ -109,6 +111,25 @@ def main_worker(gpu, ngpus_per_node, args):
           experiment_name=args.name, optimizer_state_dict=None)
 
 
+def graft_data(x, r):
+    n ,c, h, w = x.shape
+    assert n == 2
+    
+    temp = x.clone()
+    temp1 = x.clone()
+    graft_h = math.ceil(h * r)
+    temp[0, :, graft_h:, :] = x[1, :, graft_h:, :]
+    temp[1, :, graft_h:, :] = x[0, :, graft_h:, :]
+
+    a = h - graft_h
+    temp1[0, :, a:, :] = temp[0, :, : graft_h, :]
+    temp1[0, :, :a, :] = temp[0, :, graft_h:, :]
+    temp1[1, :, a :, :] = temp[1, :, : graft_h, :]
+    temp1[1, :, :a, :] = temp[1, :, graft_h:, :]
+            
+    return temp1
+
+
 def train(model, args, epochs=10, experiment_name="DeepLab", lr=0.0001, root=".", device=None,
           optimizer_state_dict=None):
     global PROJECT
@@ -180,8 +201,18 @@ def train(model, args, epochs=10, experiment_name="DeepLab", lr=0.0001, root="."
 
             optimizer.zero_grad()
 
-            img = batch['image'].to(device)
-            depth = batch['depth'].to(device)
+
+            # graft data
+            img = batch['image']
+            depth = batch['depth']
+
+            if random.random() > 0.6:
+                r = random.random()
+                img = graft_data(img, r)
+                depth = graft_data(depth, r)
+
+            img = img.to(device)
+            depth = depth.to(device)
 
             if 'has_valid_depth' in batch:
                 if not batch['has_valid_depth']:
