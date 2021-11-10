@@ -154,25 +154,23 @@ if __name__ == '__main__':
     from time import time
     import argparse
 
-    parser = argparse.ArgumentParser(description='inference')
-    parser.add_argument('--image_path', default='input.png', type=str, help='path of images')
-    parser.add_argument('--save_path', default='output.png', type=str, help='path of images')
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser(description='inference')
+    # parser.add_argument('--image_path', default='input.png', type=str, help='path of images')
+    # parser.add_argument('--save_path', default='output.png', type=str, help='path of images')
+    # args = parser.parse_args()
 
-    img = Image.open(args.image_path)
-    start = time()
-    inferHelper = InferenceHelper(dataset='kitti', checkpoint='checkpoints/augment_best.pt')      
-    centers, pred = inferHelper.predict_pil(img)
-    print(pred.shape)
-    print(f"took :{time() - start}s")
+    # img = Image.open(args.image_path)
+    # start = time()
+    # inferHelper = InferenceHelper(dataset='kitti', checkpoint='checkpoints/augment_best.pt')      
+    # centers, pred = inferHelper.predict_pil(img)
+    # print(pred.shape)
+    # print(f"took :{time() - start}s")
    
-    # predict and save image
-    final = (pred.squeeze() * 256).astype('uint16')
-    # print(type(final))
-    # print(pred.squeeze().astype('uint16'))
-    Image.fromarray(final).save(args.save_path)
+    # # predict and save image
+    # final = (pred.squeeze() * 256).astype('uint16')
+    # Image.fromarray(final).save(args.save_path)
 
-
+    # PREDICTION FOR BENCHMARKING
     # output_path = 'prediction'
     # benchmark_folder = '../../Downloads/data_depth_selection/depth_selection/test_depth_prediction_anonymous/image/'
     # inferHelper = InferenceHelper(dataset='kitti', checkpoint='./checkpoints/augment_latest.pt')
@@ -185,4 +183,18 @@ if __name__ == '__main__':
     #     final = (pred.squeeze() * 256).astype('uint16')
     #     Image.fromarray(final).save(os.path.join(output_path, path))
     #     print('saved image {}'.format(idx))
+
+    # PREDICTION FOR TEST IMAGES
+    output_path = 'test_images/augment'
+    inferHelper = InferenceHelper(dataset='kitti', checkpoint='./checkpoints/augment_doubled_latest.pt')
+
+    list_images = ['test_images/0000000093.png','test_images/0000000252.png','test_images/0000000322.png','test_images/0000000359.png']
+
+    for idx, path in enumerate(list_images):
+        img = Image.open(path)
+        centers, pred = inferHelper.predict_pil(img)
+
+        final = (pred.squeeze() * 256).astype('uint16')
+        Image.fromarray(final).save(os.path.join(path.split('/')[0], 'augment_doubled', path.split('/')[1]))
+        print('saved image {}'.format(idx))
     
