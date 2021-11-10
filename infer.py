@@ -154,6 +154,7 @@ if __name__ == '__main__':
     from time import time
     import argparse
 
+    # PREDICTION FOR SINGLE IMAGES
     parser = argparse.ArgumentParser(description='inference')
     parser.add_argument('--image_path', default='input.png', type=str, help='path of images')
     parser.add_argument('--save_path', default='output.png', type=str, help='path of images')
@@ -187,7 +188,6 @@ if __name__ == '__main__':
 
     # PREDICTION FOR TEST IMAGES
     output_path = 'test_images/augment'
-    benchmark_folder = '../../Downloads/data_depth_selection/depth_selection/test_depth_prediction_anonymous/image/'
     inferHelper = InferenceHelper(dataset='kitti', checkpoint='./checkpoints/augment_latest.pt')
 
     list_images = ['test_images/0000000093.png','test_images/0000000252.png','test_images/0000000322.png','test_images/0000000359.png']
